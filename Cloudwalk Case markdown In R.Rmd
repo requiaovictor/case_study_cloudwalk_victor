@@ -247,3 +247,59 @@ ggplot(otd_percentage, aes(x = "", y = percentage, fill = OTD)) +
         legend.title.align = 0.5, 
         legend.margin = margin(t = 10))
 ```
+
+## Creating graphs for some more information
+
+## GRAPH FOR REPRESENTING THE PERCENT OF SHIPPING FOR EACH REGION
+```{r other plots}
+regions <- c("Sudeste", "Nordeste", "Sul", "Centro-Oeste", "Norte")
+percentages <- c(45.21, 22.68, 14.93, 11.25, 5.93)
+df <- data.frame(regions, percentages)
+df$cumulative <- cumsum(df$percentages)
+ggplot(df, aes(x = "", y = percentages, fill = regions)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar(theta = "y") +
+  geom_text(aes(label = paste0(regions, " (", round(percentages, 2), "%)")),
+            position = position_stack(vjust = 0.5)) +
+  theme_void() +
+  theme(legend.position = "none")
+```
+
+## DATA FOR REPRESENTING SHIPMENTS PER PROVIDER
+
+```{r}
+providers <- c("Provider 1", "Provider 2")
+transactions <- c(8917, 33793)
+total_transactions <- sum(transactions)
+percentages <- transactions / total_transactions * 100
+df <- data.frame(providers, percentages)
+ggplot(df, aes(x = "", y = percentages, fill = providers)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar(theta = "y") +
+  geom_text(aes(label = paste0(providers, "\n", round(percentages, 2), "%")),
+            position = position_stack(vjust = 0.5)) +
+  theme_void() +
+  theme(legend.position = "none")
+```
+
+## deliverys - returns - cancelled 
+
+```{r}
+deliveries <- 42220
+returns <- 445
+cancelled <- 45
+total_orders <- deliveries + returns + cancelled
+delivery_percentage <- deliveries / total_orders * 100
+return_percentage <- returns / total_orders * 100
+cancel_percentage <- cancelled / total_orders * 100
+df <- data.frame(
+  Category = c("Deliveries", "Returns", "Cancelled"),
+  Percentage = c(delivery_percentage, return_percentage, cancel_percentage)
+)
+colors <- c("#FF5722", "#FFEB3B", "#2196F3")
+ggplot(df, aes(x = "", y = Percentage, fill = Category)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar(theta = "y") +
+    scale_fill_manual(values = colors) +
+  theme_void()
+```
