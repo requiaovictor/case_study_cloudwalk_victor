@@ -202,3 +202,29 @@ SELECT
   AVG(EXTRACT(epoch FROM (delivered_at - in_transit_to_deliver_at)) / 86400) AS diff_delivery_to_transit_deliver
 FROM cloudwalk
 WHERE status = 'delivered';
+
+## PERCENTAGES OF OTD PER REGION
+
+WITH delivered_region AS (
+    SELECT region, COUNT(*) AS delivered
+    FROM cloudwalk
+    WHERE status ILIKE 'delivered'
+    GROUP BY region
+),
+on_time AS (
+    SELECT region, COUNT(*) AS on_time
+    FROM cloudwalk
+    WHERE status ILIKE 'delivered' AND otd ILIKE 'on time'
+    GROUP BY region
+)
+SELECT
+    a.region,
+    a.delivered,
+    b.on_time,
+    (b.on_time * 100.0) / a.delivered AS percentage_on_time
+FROM
+    delivered_region a
+INNER JOIN
+    on_time b
+ON
+    a.region = b.region;
